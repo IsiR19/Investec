@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Investec
 {
-    public class People
+    public class Actors
     {
         public string Name { get; set; }
 
-        public List<Movies> Films { get; set; }
+        public List<Films> Films { get; set; }
     }
 }

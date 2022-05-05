@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Investec
 {
-    public class Movies
+    public class Films
     {
         public string Name { get; set; }
     }

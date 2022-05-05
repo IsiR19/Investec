@@ -24,29 +24,29 @@ namespace Investec
         #endregion
 
         #region Methods
-        public async Task<List<People>> GetPeopleList(List<People> actors, string url)
+        public async Task<List<Actors>> GetPeopleList(List<Actors> actors, string url)
         {
                 var response = await _httpClient.GetAsync(url);
-                People people = new People();
+                Actors people = new Actors();
 
                 if (response.IsSuccessStatusCode) {
                     var personData = await response.Content.ReadAsStringAsync();
                     var personObject = JObject.Parse(personData);
-                    url = personObject.SelectToken("next").ToString() != null ? personObject.SelectToken("next").ToString() : null;
+                    url = personObject.SelectToken("next").ToString() ?? null;
                     foreach (var personResult in personObject) {
                         if (personResult.Key == "results") {
                             if (personResult.Value != null) {
                                 foreach (var person in personResult.Value) {
                                     // get actor name
-                                    var actor = new People {
+                                    var actor = new Actors {
                                         Name = person.SelectToken("name").ToString()
                                     };
-                                    List<Movies> movies = new List<Movies>();
+                                    List<Films> movies = new List<Films>();
                                     // get list of films
                                     IList<string> films = person.SelectToken("films").Select(s => (string)s).ToList();
                                     //substring movies by Id
                                     foreach (var film in films) {
-                                        Movies movie = new Movies {
+                                        Films movie = new Films {
                                             Name = film.Split('/')[5]
                                         };
                                         //add movie list to actors
@@ -58,15 +58,12 @@ namespace Investec
                             }
                         }
                     }
-                    if (url != null) {
+                    if (! String.IsNullOrEmpty(url)) {
                        await GetPeopleList(actors, url);
-                    }
-                    else {
-                        return actors;
                     }
                 }
 
-            return null;
+            return actors;
         }
 
         #endregion
