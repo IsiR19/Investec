@@ -12,7 +12,7 @@ namespace Investec
         {
             SwapiApi api = new SwapiApi();
 
-            var buddies = await api.GetPeopleList();
+            var buddies = await api.GetPeopleList(new List<People>(),"https://swapi.dev/api/people");
         }
     }
 }

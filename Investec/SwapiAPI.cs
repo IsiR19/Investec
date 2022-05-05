@@ -6,81 +6,67 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Investec
 {
     public class SwapiApi
     {
         #region Fields
-        private readonly new IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
+        #endregion
+
+        #region Constructor
+        public SwapiApi()
+        {
+            _httpClient = new HttpClient();
+        }
         #endregion
 
         #region Methods
-        public async Task<People> GetPeopleList()
+        public async Task<List<People>> GetPeopleList(List<People> actors, string url)
         {
-            //get url
-            string url = $"https://swapi.dev/api/people";
-            HttpResponseMessage response = new HttpResponseMessage();
+                var response = await _httpClient.GetAsync(url);
+                People people = new People();
 
-            // http client implementation
-            try
-            {
-                var client = _httpClientFactory.CreateClient();
-            
-            var result = await client.GetAsync(url);
-            var buddies = new Dictionary<string, string>();
-            List<People> people = new List<People>();
-
-                if (result.IsSuccessStatusCode)
-            {
-                var content = await result.Content.ReadAsStringAsync();
-                var contentObject = JObject.Parse(content);
-                
-                foreach (var item in contentObject)
-                {
-                      
-                    if(item.Key == "results")
-                    {
-                            foreach(var person in item.Value)
-                            {
-                                 people.Name = person.SelectToken("name").ToString();
-                            }
-                    }
-
-                    if(item.Key == "films")
-                        {
-                            foreach (var film in item.Value)
-                            {
-                                people.Films.Add(film.Value.T);
-
-                                var filmArray = JArray.Parse(item.ToString());
-                                foreach (var filmName in filmArray)
-                                {
-                                    people.Films.Add(filmName.ToString());
+                if (response.IsSuccessStatusCode) {
+                    var personData = await response.Content.ReadAsStringAsync();
+                    var personObject = JObject.Parse(personData);
+                    url = personObject.SelectToken("next").ToString() != null ? personObject.SelectToken("next").ToString() : null;
+                    foreach (var personResult in personObject) {
+                        if (personResult.Key == "results") {
+                            if (personResult.Value != null) {
+                                foreach (var person in personResult.Value) {
+                                    // get actor name
+                                    var actor = new People {
+                                        Name = person.SelectToken("name").ToString()
+                                    };
+                                    List<Movies> movies = new List<Movies>();
+                                    // get list of films
+                                    IList<string> films = person.SelectToken("films").Select(s => (string)s).ToList();
+                                    //substring movies by Id
+                                    foreach (var film in films) {
+                                        Movies movie = new Movies {
+                                            Name = film.Split('/')[5]
+                                        };
+                                        //add movie list to actors
+                                        movies.Add(movie);  
+                                    }
+                                    actor.Films = movies;
+                                    actors.Add(actor);
                                 }
                             }
-
                         }
-                }
-                
-
-                foreach (var buddy in people)
-                    {
-                       
-
                     }
-            }
-
-            }
-            catch (Exception ex)
-            {
-                response = new HttpResponseMessage();
-            }
-
+                    if (url != null) {
+                       await GetPeopleList(actors, url);
+                    }
+                    else {
+                        return actors;
+                    }
+                }
 
             return null;
-            
-           
         }
 
         #endregion
