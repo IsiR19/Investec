@@ -13,7 +13,8 @@ namespace Investec
             var friendsList = await interactor.GetBuddies(buddies);
 
             foreach (var friend in friendsList) {
-                Console.WriteLine($"Actor: {friend.ActorName}, buddies: {friend.FriendName.ToString()}");
+                friend.FriendName.Remove(friend.ActorName);
+                Console.WriteLine($"Actor: {friend.ActorName} " + $"buddies: {string.Join(",",friend.FriendName.ToArray())}");
             }
         }
     }

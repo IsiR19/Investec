@@ -15,8 +15,6 @@ namespace Investec
         public Task<List<Buddy>> GetBuddies(List<Actors> actors)
         {
             var friendsByMovie = new Dictionary<string,List<string>>();
-            
-            
             List<Buddy> buddyList = new List<Buddy>();
            
             foreach (var actor in actors) {
@@ -51,7 +49,7 @@ namespace Investec
 
                 buddyList.Add(buddy);
             }
-            return buddyList.ToList();  
+            return Task.Run(() => buddyList.ToList());  
             } 
     }
 }
