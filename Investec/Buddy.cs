@@ -10,5 +10,7 @@ namespace Investec
     {
         public string ActorName { get; set; }
         public List<string> FriendName { get; set; }
+
+        
     }
 }

@@ -8,18 +8,19 @@ namespace Investec
 {
     public interface IBuddiesInteractor
     {
-        Task<IEnumerable<Buddy>> GetBuddies(List<Actors> actors);
+        Task<List<Buddy>> GetBuddies(List<Actors> actors);
     }
     public class BuddiesInteractor : IBuddiesInteractor
     {
-        public Task<IEnumerable<Buddy>> GetBuddies(List<Actors> actors)
+        public Task<List<Buddy>> GetBuddies(List<Actors> actors)
         {
             var friendsByMovie = new Dictionary<string,List<string>>();
-            var buddies = new List<Buddy>();
+            
+            
+            List<Buddy> buddyList = new List<Buddy>();
            
             foreach (var actor in actors) {
-                //I have a list of actors who acted in movies 
-                //need to select all the people who have acted in the same movie 
+                var friendList = new List<string>();
                 var filmList = actor.Films.GroupBy(x => x.Name).Select(f => f.First());
                 var actorList = new List<string>();
                 foreach (var film in filmList) {
@@ -28,15 +29,30 @@ namespace Investec
                                             from f in a.Films
                                             where f.Name == film.Name
                                             select a.Name).ToList();
-
+                        
                         friendsByMovie.Add(film.Name, actorsByfilm);
                         }
                     };
-                
+
+                //extract list and concatanate 
+                var friends = (from f in friendsByMovie
+                               where f.Value.Contains(actor.Name)
+                               select f.Value).ToList();
+
+
+                foreach (var friend in friends) {
+                    friendList.AddRange(friend);
                 }
-                
+
+                Buddy buddy = new Buddy {
+                    ActorName = actor.Name,
+                    FriendName = friendList.Distinct().ToList()   
+                };
+
+                buddyList.Add(buddy);
             }
-            //return null;
-        }
+            return buddyList.ToList();  
+            } 
     }
 }
+
