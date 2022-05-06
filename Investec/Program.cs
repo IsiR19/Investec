@@ -5,10 +5,10 @@ namespace Investec
     {
       public static async Task Main(string[] args)
         {
-            SwapiApi api = new SwapiApi();
+            SwapiApi Swapi = new SwapiApi();
             BuddiesInteractor interactor = new BuddiesInteractor();
 
-            var buddies = await api.GetPeopleList(new List<Actors>(),"https://swapi.dev/api/people");
+            var buddies = await Swapi.GetPeopleList(new List<Actors>(),"https://swapi.dev/api/people");
 
             var friendsList = await interactor.GetBuddies(buddies);
 

@@ -19,9 +19,15 @@ namespace Investec
            
             foreach (var actor in actors) {
                 var friendList = new List<string>();
-                var filmList = actor.Films.GroupBy(x => x.Name).Select(f => f.First());
                 var actorList = new List<string>();
+
+                //get actors movies
+                var filmList = actor.Films.GroupBy(x => x.Name).Select(f => f.First());
+                                
+                //Go through movie list to see if friends have been extracted for movie
+                //If not get friends of movies not in list
                 foreach (var film in filmList) {
+                    //If movie exist in list, friends have already been extracted no need to duplicate process
                     if (!friendsByMovie.ContainsKey(film.Name)) {
                         var actorsByfilm = (from a in actors
                                             from f in a.Films
