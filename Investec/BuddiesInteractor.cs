@@ -43,11 +43,11 @@ namespace Investec
                                where f.Value.Contains(actor.Name)
                                select f.Value).ToList();
 
-
+                //add friends to single list
                 foreach (var friend in friends) {
                     friendList.AddRange(friend);
                 }
-
+                //create buddy object for each actor store in memory
                 Buddy buddy = new Buddy {
                     ActorName = actor.Name,
                     FriendName = friendList.Distinct().ToList()   
